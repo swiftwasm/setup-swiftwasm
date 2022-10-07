@@ -11,6 +11,7 @@ async function run() {
   core.debug(`Resolved toolchain download URL: ${url}`);
   const toolchainPath = await installToolchain(url, version, platform);
   core.info(`Toolchain installed at ${toolchainPath}`);
+  core.info(`readdirSync: ${fs.readdirSync(toolchainPath)}`);
   core.addPath(`${toolchainPath}/usr/bin`);
 }
 
