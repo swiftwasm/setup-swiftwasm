@@ -6796,7 +6796,9 @@ function resolveHostPlatform() {
     const osReleaseMap = {};
     for (const line of lines) {
       const [key, value] = line.split('=');
-      osReleaseMap[key] = value.replace(/["]/g, "");
+      if (key && value) {
+        osReleaseMap[key] = value.replace(/["]/g, "");
+      }
     }
     return osReleaseMap;
   }
