@@ -10,13 +10,14 @@ async function run() {
   const url = toolchainDownloadUrl(version, platform);
   core.debug(`Resolved toolchain download URL: ${url}`);
   const toolchainPath = await installToolchain(url, version, platform);
+  core.info(`Toolchain installed at ${toolchainPath}`);
   core.addPath(`${toolchainPath}/usr/bin`);
 }
 
 async function installToolchain(url, version, platform) {
   const cachePath = tc.find("swiftwasm", version, platform.arch);
   if (cachePath) {
-    core.debug("Toolchain already installed.");
+    core.info("Toolchain already installed.");
     return cachePath;
   }
   core.debug(`Downloading tool from ${url}`);
