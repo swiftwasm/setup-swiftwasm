@@ -1,7 +1,7 @@
 {
-  "name": "javascript-action",
+  "name": "setup-swiftwasm",
   "version": "1.0.0",
-  "description": "JavaScript Action Template",
+  "description": "Download a prebuilt SwiftWasm toolchain and add it to the PATH",
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
@@ -11,21 +11,24 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/javascript-action.git"
+    "url": "git+https://github.com/swiftwasm/setup-swiftwasm.git"
   },
   "keywords": [
     "GitHub",
     "Actions",
-    "JavaScript"
+    "SwiftWasm",
+    "Swift",
+    "WebAssembly"
   ],
-  "author": "",
+  "author": "swiftwasm",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/actions/javascript-action/issues"
+    "url": "https://github.com/swiftwasm/setup-swiftwasm/issues"
   },
-  "homepage": "https://github.com/actions/javascript-action#readme",
+  "homepage": "https://github.com/swiftwasm/setup-swiftwasm#readme",
   "dependencies": {
-    "@actions/core": "^1.10.0"
+    "@actions/core": "^1.10.0",
+    "@actions/tool-cache": "^2.0.1"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.31.1",

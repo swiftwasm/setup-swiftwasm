@@ -1,13 +1,10 @@
 name: 'Wait'
 description: 'Wait a designated number of milliseconds'
 inputs:
-  milliseconds:  # id of input
-    description: 'number of milliseconds to wait'
+  swift-version:
+    description: 'Swift version to configure (default: wasm-RELEASE-5.7.1)'
     required: true
-    default: '1000'
-outputs:
-  time: # output will be available to future steps
-    description: 'The current time after waiting'
+    default: 'wasm-RELEASE-5.7.1'
 runs:
   using: 'node16'
   main: 'dist/index.js'
