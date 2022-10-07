@@ -117,7 +117,7 @@ function resolveHostPlatform() {
 }
 
 function toolchainDownloadUrl(version, platform) {
-  `https://github.com/swiftwasm/swift/releases/download/swift-${version}/swift-${version}-${platform.suffix}.${platform.pkg}`;
+  return `https://github.com/swiftwasm/swift/releases/download/swift-${version}/swift-${version}-${platform.suffix}.${platform.pkg}`;
 }
 
 run();
