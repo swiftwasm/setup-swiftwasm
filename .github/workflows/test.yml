@@ -17,9 +17,17 @@ jobs:
 
   # test action works running from the graph
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+        - swift-version: wasm-5.7.1-RELEASE
+          os: ubuntu-20.04
+        - swift-version: wasm-5.6.0-RELEASE
+          os: macos-11
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./
       with:
-        swift-version: wasm-5.7.1-RELEASE
+        swift-version: ${{ matrix.swift-version }}
