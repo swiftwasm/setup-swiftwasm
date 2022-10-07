@@ -6704,6 +6704,7 @@ const fs = __nccwpck_require__(5747);
 const core = __nccwpck_require__(2186);
 const tc = __nccwpck_require__(7784);
 const os = __nccwpck_require__(2087);
+const path = __nccwpck_require__(5622);
 
 async function run() {
   const version = resolveVersionInput();
@@ -6728,12 +6729,17 @@ async function installToolchain(url, version, platform) {
   core.debug(`Installing toolchain from ${downloadPath}`);
   let toolchainPath;
   switch (platform.pkg) {
-    case "tar.gz":
-      toolchainPath = await tc.extractTar(downloadPath);
+    case "tar.gz": {
+      const extractedPath = await tc.extractTar(downloadPath);
+      toolchainPath = path.join(extractedPath, `swift-${version}`);
       break;
-    case "pkg":
-      toolchainPath = await tc.extractXar(downloadPath);
+    }
+    case "pkg": {
+      const extractedPath = await tc.extractXar(downloadPath);
+      const untared = await tc.extractTar(path.join(extractedPath, "Payload"));
+      toolchainPath = path.join(untared, `swift-${version}`);
       break;
+    }
     default:
       throw new Error(`Unsupported package type: ${platform.pkg}`);
   }

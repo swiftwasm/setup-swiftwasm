@@ -2,6 +2,7 @@ const fs = require("fs");
 const core = require("@actions/core");
 const tc = require("@actions/tool-cache");
 const os = require("os");
+const path = require("path");
 
 async function run() {
   const version = resolveVersionInput();
@@ -26,12 +27,17 @@ async function installToolchain(url, version, platform) {
   core.debug(`Installing toolchain from ${downloadPath}`);
   let toolchainPath;
   switch (platform.pkg) {
-    case "tar.gz":
-      toolchainPath = await tc.extractTar(downloadPath);
+    case "tar.gz": {
+      const extractedPath = await tc.extractTar(downloadPath);
+      toolchainPath = path.join(extractedPath, `swift-${version}`);
       break;
-    case "pkg":
-      toolchainPath = await tc.extractXar(downloadPath);
+    }
+    case "pkg": {
+      const extractedPath = await tc.extractXar(downloadPath);
+      const untared = await tc.extractTar(path.join(extractedPath, "Payload"));
+      toolchainPath = path.join(untared, `swift-${version}`);
       break;
+    }
     default:
       throw new Error(`Unsupported package type: ${platform.pkg}`);
   }
