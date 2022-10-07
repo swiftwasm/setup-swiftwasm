@@ -6736,9 +6736,7 @@ async function installToolchain(url, version, platform) {
     }
     case "pkg": {
       const extractedPath = await tc.extractXar(downloadPath);
-      const untared = await tc.extractTar(path.join(extractedPath, "Payload"));
-      toolchainPath = path.join(untared, `swift-${version}`);
-      core.info(`untared: ${fs.readdirSync(untared)}`);
+      toolchainPath = await tc.extractTar(path.join(extractedPath, "Payload"));
       break;
     }
     default:
