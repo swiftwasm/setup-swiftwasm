@@ -1,5 +1,5 @@
-name: 'Wait'
-description: 'Wait a designated number of milliseconds'
+name: 'Setup SwiftWasm'
+description: 'Download a SwiftWasm toolchain and add it to the PATH'
 inputs:
   swift-version:
     description: 'Swift version to configure (default: wasm-5.7.1-RELEASE)'
