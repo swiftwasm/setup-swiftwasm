@@ -6724,7 +6724,7 @@ async function installToolchain(url, version, platform) {
     core.info("Toolchain already installed.");
     return cachePath;
   }
-  core.debug(`Downloading tool from ${url}`);
+  core.info(`Downloading tool from ${url}`);
   const downloadPath = await tc.downloadTool(url);
   core.debug(`Installing toolchain from ${downloadPath}`);
   let toolchainPath;
@@ -6738,6 +6738,7 @@ async function installToolchain(url, version, platform) {
       const extractedPath = await tc.extractXar(downloadPath);
       const untared = await tc.extractTar(path.join(extractedPath, "Payload"));
       toolchainPath = path.join(untared, `swift-${version}`);
+      core.info(`untared: ${fs.readdirSync(untared)}`);
       break;
     }
     default:
