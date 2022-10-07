@@ -2,9 +2,9 @@ name: 'Wait'
 description: 'Wait a designated number of milliseconds'
 inputs:
   swift-version:
-    description: 'Swift version to configure (default: wasm-RELEASE-5.7.1)'
+    description: 'Swift version to configure (default: wasm-5.7.1-RELEASE)'
     required: true
-    default: 'wasm-RELEASE-5.7.1'
+    default: 'wasm-5.7.1-RELEASE'
 runs:
   using: 'node16'
   main: 'dist/index.js'
