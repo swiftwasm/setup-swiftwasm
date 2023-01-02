@@ -4,10 +4,9 @@ branding:
   color: orange
   icon: download
 inputs:
-  channel:
-    description: 'SwiftWasm toolchain channel (default: DEVELOPMENT)'
-    required: true
-    default: 'DEVELOPMENT'
+  token:
+    description: Personal access token (PAT) used to fetch releases.
+    default: ${{ github.token }}
 runs:
   using: 'node16'
   main: '../dist/nightly/index.js'

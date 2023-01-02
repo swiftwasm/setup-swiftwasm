@@ -1,21 +1,22 @@
 const { run } = require('../index');
+const github = require('@actions/github');
+const core = require('@actions/core');
 
 // Get the latest release, that starts with "swift-wasm-DEVELOPMENT-SNAPSHOT-" from the swiftwasm/swift repository using GitHub API and paginate the results until we find the latest one.
 async function getLatestNightlyVersion() {
-  let page = 1;
-  let version = null;
-  while (!version) {
-    const response = await fetch(`https://api.github.com/repos/swiftwasm/swift/releases?per_page=100&page=${page}`);
-    const releases = await response.json();
-    for (const release of releases) {
+  const token = core.getInput('token');
+  const octokit = github.getOctokit(token);
+  for await (const response of octokit.paginate.iterator(octokit.repos.listReleases, {
+    owner: 'swiftwasm',
+    repo: 'swift',
+  })) {
+    for (const release of response.data) {
       if (release.tag_name.startsWith('swift-wasm-DEVELOPMENT-SNAPSHOT-')) {
-        version = release.tag_name;
-        break;
+        return release.tag_name;
       }
     }
-    page++;
   }
-  return version;
+  throw new Error('No nightly release found');
 }
 
 getLatestNightlyVersion().then(run);
