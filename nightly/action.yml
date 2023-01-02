@@ -1,0 +1,13 @@
+name: 'Setup Nightly SwiftWasm'
+description: 'Download a latest nightly SwiftWasm toolchain and add it to the PATH'
+branding:
+  color: orange
+  icon: download
+inputs:
+  channel:
+    description: 'SwiftWasm toolchain channel (default: DEVELOPMENT)'
+    required: true
+    default: 'DEVELOPMENT'
+runs:
+  using: 'node16'
+  main: '../dist/nightly/index.js'

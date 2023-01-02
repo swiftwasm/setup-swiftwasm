@@ -4,8 +4,7 @@ const tc = require("@actions/tool-cache");
 const os = require("os");
 const path = require("path");
 
-async function run() {
-  const version = resolveVersionInput();
+async function run(version) {
   validateVersion(version);
   const platform = resolveHostPlatform();
   const url = toolchainDownloadUrl(version, platform);
@@ -13,6 +12,7 @@ async function run() {
   const toolchainPath = await installToolchain(url, version, platform);
   core.info(`Toolchain installed at ${toolchainPath}`);
   core.addPath(`${toolchainPath}/usr/bin`);
+  core.setOutput("toolchain-path", toolchainPath);
 }
 
 async function installToolchain(url, version, platform) {
@@ -126,4 +126,4 @@ function toolchainDownloadUrl(version, platform) {
   return `https://github.com/swiftwasm/swift/releases/download/swift-${version}/swift-${version}-${platform.suffix}.${platform.pkg}`;
 }
 
-run();
+module.exports = { run, resolveVersionInput };
