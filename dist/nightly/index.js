@@ -13709,7 +13709,9 @@ async function getLatestNightlyVersion() {
   })) {
     for (const release of response.data) {
       if (release.tag_name.startsWith('swift-wasm-DEVELOPMENT-SNAPSHOT-')) {
-        return release.tag_name;
+        const tagName = release.tag_name;
+        // Strip swift- prefix from the tag name
+        return tagName.substring("swift-".length);
       }
     }
   }
