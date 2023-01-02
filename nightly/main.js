@@ -6,7 +6,7 @@ const core = require('@actions/core');
 async function getLatestNightlyVersion() {
   const token = core.getInput('token');
   const octokit = github.getOctokit(token);
-  for await (const response of octokit.paginate.iterator(octokit.repos.listReleases, {
+  for await (const response of octokit.paginate.iterator("GET /repos/{owner}/{repo}/releases", {
     owner: 'swiftwasm',
     repo: 'swift',
   })) {
