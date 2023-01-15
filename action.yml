@@ -5,9 +5,7 @@ branding:
   icon: download
 inputs:
   swift-version:
-    description: 'Swift version to configure (default: wasm-5.7.1-RELEASE)'
-    required: true
-    default: 'wasm-5.7.1-RELEASE'
+    description: 'Swift version to configure. Reads from .swift-version if unset.'
 runs:
   using: 'node16'
   main: 'dist/index.js'

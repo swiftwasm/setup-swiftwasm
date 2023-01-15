@@ -44,8 +44,8 @@ async function installToolchain(url, version, platform) {
   return cachedPath;
 }
 
-function resolveVersionInput(options = {}) {
-  const version = core.getInput('swift-version') || options.version;
+function resolveVersionInput() {
+  const version = core.getInput('swift-version');
   if (version) {
     core.debug(`Using version from input: ${version}`);
     return version;
