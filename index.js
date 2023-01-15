@@ -4,6 +4,8 @@ const tc = require("@actions/tool-cache");
 const os = require("os");
 const path = require("path");
 
+const defaultSwiftVersion = "wasm-5.7.1-RELEASE";
+
 async function run(version) {
   validateVersion(version);
   const platform = resolveHostPlatform();
@@ -44,8 +46,8 @@ async function installToolchain(url, version, platform) {
   return cachedPath;
 }
 
-function resolveVersionInput(options = {}) {
-  const version = core.getInput('swift-version') || options.version;
+function resolveVersionInput() {
+  const version = core.getInput('swift-version');
   if (version) {
     core.debug(`Using version from input: ${version}`);
     return version;
@@ -57,9 +59,8 @@ function resolveVersionInput(options = {}) {
       return versionFile;
     }
   }
-  const message = "No Swift version specified. Please specify a version using the 'swift-version' input or a .swift-version file.";
-  core.error(message);
-  throw new Error(message);
+  core.debug(`Using version from default: ${defaultSwiftVersion}`);
+  return defaultSwiftVersion;
 }
 
 function validateVersion(version) {
@@ -67,7 +68,7 @@ function validateVersion(version) {
     throw new Error("Empty version specified.");
   }
   if (!version.startsWith("wasm-")) {
-    throw new Error(`Invalid version specified: ${version}. Version must start with 'wasm-'. For example: 'wasm-5.7.1-RELEASE'`);
+    throw new Error(`Invalid version specified: ${version}. Version must start with 'wasm-'. For example: '${defaultSwiftVersion}'`);
   }
 }
 
