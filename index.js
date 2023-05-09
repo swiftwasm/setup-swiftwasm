@@ -4,7 +4,7 @@ const tc = require("@actions/tool-cache");
 const os = require("os");
 const path = require("path");
 
-const defaultSwiftVersion = "wasm-5.7.1-RELEASE";
+const defaultSwiftVersion = "wasm-5.8.0-RELEASE";
 
 async function run(version) {
   validateVersion(version);

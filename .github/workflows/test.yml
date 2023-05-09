@@ -32,6 +32,12 @@ jobs:
       with:
         swift-version: ${{ matrix.swift-version }}
     - run: swift --version
+  test-default:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./
+    - run: swift --version
   test-nightly:
     runs-on: ubuntu-20.04
     steps:
