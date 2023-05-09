@@ -10,7 +10,7 @@ const tc = __nccwpck_require__(7784);
 const os = __nccwpck_require__(2037);
 const path = __nccwpck_require__(1017);
 
-const defaultSwiftVersion = "wasm-5.7.1-RELEASE";
+const defaultSwiftVersion = "wasm-5.8.0-RELEASE";
 
 async function run(version) {
   validateVersion(version);
