@@ -120,7 +120,13 @@ function resolveHostPlatform() {
     if (osRelease.ID === "ubuntu") {
       const arch = normalizeArch(os.arch());
       return { suffix: `ubuntu${osRelease.VERSION_ID}_${arch}`, pkg: "tar.gz", arch };
+    } else if (osRelease.ID === "amzn") {
+      if (osRelease.VERSION_ID === "2") {
+        const arch = normalizeArch(os.arch());
+        return { suffix: `amazonlinux2_${arch}`, pkg: "tar.gz", arch };
+      }
     }
+    throw new Error(`Unsupported Linux distribution: ${osRelease.ID} ${osRelease.VERSION_ID}`);
   } else if (platform === "macos") {
     const arch = normalizeArch(os.arch());
     return { suffix: `macos_${arch}`, pkg: "pkg", arch };
