@@ -25,7 +25,11 @@ jobs:
           os: ubuntu-20.04
         - swift-version: wasm-5.6.0-RELEASE
           os: macos-11
+        - swift-version: wasm-5.8.0-RELEASE
+          os: ubuntu-latest
+          container: swift:amazonlinux2
     runs-on: ${{ matrix.os }}
+    container: ${{ matrix.container }}
     steps:
     - uses: actions/checkout@v3
     - uses: ./
