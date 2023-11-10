@@ -11,7 +11,7 @@ jobs:
   units:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     - run: npm ci
     - run: npm test
 
@@ -31,7 +31,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     - uses: ./
       with:
         swift-version: ${{ matrix.swift-version }}
@@ -39,12 +39,12 @@ jobs:
   test-default:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     - uses: ./
     - run: swift --version
   test-nightly:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     - uses: ./nightly
     - run: swift --version
