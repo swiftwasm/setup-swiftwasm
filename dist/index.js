@@ -19,7 +19,9 @@ async function run(version) {
   core.debug(`Resolved toolchain download URL: ${url}`);
   const toolchainPath = await installToolchain(url, version, platform);
   core.info(`Toolchain installed at ${toolchainPath}`);
-  core.addPath(`${toolchainPath}/usr/bin`);
+  if (core.getBooleanInput("add-to-path")) {
+    core.addPath(`${toolchainPath}/usr/bin`);
+  }
   core.setOutput("toolchain-path", toolchainPath);
 }
 
