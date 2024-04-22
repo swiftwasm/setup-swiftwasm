@@ -6,6 +6,9 @@ branding:
 inputs:
   swift-version:
     description: 'Swift version to configure. Reads from .swift-version if unset. Use default value if both are absent.'
+  add-to-path:
+    description: 'Add the toolchain to the PATH'
+    default: 'true'
 runs:
   using: 'node16'
   main: 'dist/index.js'

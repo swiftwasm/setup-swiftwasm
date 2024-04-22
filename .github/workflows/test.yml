@@ -42,6 +42,27 @@ jobs:
     - uses: actions/checkout@v3
     - uses: ./
     - run: swift --version
+  test-skip-add-to-path:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v3
+    - uses: ./
+      id: setup
+      with:
+        add-to-path: false
+    - name: Ensure that the toolchain is not added to the PATH
+      shell: node {0}
+      run: |
+        const path = require('path');
+        const toolchainPath = path.join(process.env.TOOLCHAIN_PATH, 'usr', 'bin');
+        const pathEnv = process.env.PATH;
+        console.log(`Checking if ${toolchainPath} is in the PATH (${pathEnv})`);
+        const pathCandidates = pathEnv.split(path.delimiter);
+        if (pathCandidates.includes(toolchainPath)) {
+          throw new Error(`Toolchain path ${toolchainPath} is in the PATH`);
+        }
+      env:
+        TOOLCHAIN_PATH: ${{ steps.setup.outputs.toolchain-path }}
   test-nightly:
     runs-on: ubuntu-20.04
     steps:
