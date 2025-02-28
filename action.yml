@@ -10,5 +10,5 @@ inputs:
     description: 'Add the toolchain to the PATH'
     default: 'true'
 runs:
-  using: 'node16'
+  using: 'node20'
   main: 'dist/index.js'
