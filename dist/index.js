@@ -27590,10 +27590,8 @@ var __webpack_exports__ = {};
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(7484);
-var core_default = /*#__PURE__*/__nccwpck_require__.n(core);
 // EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
 var exec = __nccwpck_require__(5236);
-var exec_default = /*#__PURE__*/__nccwpck_require__.n(exec);
 // EXTERNAL MODULE: external "os"
 var external_os_ = __nccwpck_require__(857);
 var external_os_default = /*#__PURE__*/__nccwpck_require__.n(external_os_);
@@ -27603,24 +27601,24 @@ var external_os_default = /*#__PURE__*/__nccwpck_require__.n(external_os_);
 
 
 async function run() {
-  const tag = core_default().getInput("tag") || await tagFromSwiftVersion();
+  const tag = core.getInput("tag") || await tagFromSwiftVersion();
   const swiftSDKInfo = await swiftSDKInfoFromTag(tag);
-  const target = core_default().getInput("target");
+  const target = core.getInput("target");
   const sdk = swiftSDKInfo["swift-sdks"][target];
   await installSwiftSDK(sdk.url, sdk.checksum);
 }
 
 /** @returns {Promise<string>} */
 async function tagFromSwiftVersion() {
-  core_default().info("Checking Swift version...");
-  const versionOutput = await exec_default().getExecOutput("swift", ["--version"]);
+  core.info("Checking Swift version...");
+  const versionOutput = await exec.getExecOutput("swift", ["--version"]);
   if (versionOutput.exitCode !== 0) {
     throw new Error("Failed to check Swift version.");
   }
   const versionFingerprint = versionOutput.stdout.split((external_os_default()).EOL)[0];
-  core_default().info(`Swift version: ${versionFingerprint}`);
+  core.info(`Swift version: ${versionFingerprint}`);
 
-  core_default().info("Checking SDK index...");
+  core.info("Checking SDK index...");
   const tagByVersionUrl = "https://raw.githubusercontent.com/swiftwasm/swift-sdk-index/refs/heads/main/v1/tag-by-version.json";
   const tagByVersion = await (await fetch(tagByVersionUrl)).json();
   const tag = tagByVersion[versionFingerprint];
@@ -27635,7 +27633,7 @@ async function tagFromSwiftVersion() {
  * @returns {Promise<{"swift-sdks": { [key: string]: { id: string, url: string, checksum: string }}}>}
  */
 async function swiftSDKInfoFromTag(tag) {
-  core_default().info(`Querying SDK index for tag: ${tag}`);
+  core.info(`Querying SDK index for tag: ${tag}`);
   const buildUrl = `https://raw.githubusercontent.com/swiftwasm/swift-sdk-index/refs/heads/main/v1/builds/${tag}.json`;
   const build = await (await fetch(buildUrl)).json();
   return build;
@@ -27647,7 +27645,7 @@ async function swiftSDKInfoFromTag(tag) {
  */
 async function installSwiftSDK(url, checksum) {
   const args = ["sdk", "install", url, "--checksum", checksum];
-  const exitCode = await exec_default().exec("swift", args);
+  const exitCode = await exec.exec("swift", args);
   if (exitCode !== 0) {
     throw new Error(`Failed to install Swift SDK: ${url}`);
   }

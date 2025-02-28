@@ -1,5 +1,5 @@
-import core from "@actions/core";
-import exec from "@actions/exec";
+import * as core from "@actions/core";
+import * as exec from "@actions/exec";
 import os from "os";
 
 export async function run() {
