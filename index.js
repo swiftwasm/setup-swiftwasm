@@ -52,5 +52,3 @@ async function installSwiftSDK(url, checksum) {
     throw new Error(`Failed to install Swift SDK: ${url}`);
   }
 }
-
-module.exports = { run };

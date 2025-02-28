@@ -1,80 +1,6 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 6136:
-/***/ ((module, __webpack_exports__, __nccwpck_require__) => {
-
-"use strict";
-/* harmony export */ __nccwpck_require__.d(__webpack_exports__, {
-/* harmony export */   e: () => (/* binding */ run)
-/* harmony export */ });
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(7484);
-/* harmony import */ var _actions_core__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__nccwpck_require__.n(_actions_core__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _actions_exec__WEBPACK_IMPORTED_MODULE_1__ = __nccwpck_require__(5236);
-/* harmony import */ var _actions_exec__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__nccwpck_require__.n(_actions_exec__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var os__WEBPACK_IMPORTED_MODULE_2__ = __nccwpck_require__(857);
-/* harmony import */ var os__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(os__WEBPACK_IMPORTED_MODULE_2__);
-/* module decorator */ module = __nccwpck_require__.hmd(module);
-
-
-
-
-async function run() {
-  const tag = _actions_core__WEBPACK_IMPORTED_MODULE_0___default().getInput("tag") || await tagFromSwiftVersion();
-  const swiftSDKInfo = await swiftSDKInfoFromTag(tag);
-  const target = _actions_core__WEBPACK_IMPORTED_MODULE_0___default().getInput("target");
-  const sdk = swiftSDKInfo["swift-sdks"][target];
-  await installSwiftSDK(sdk.url, sdk.checksum);
-}
-
-/** @returns {Promise<string>} */
-async function tagFromSwiftVersion() {
-  _actions_core__WEBPACK_IMPORTED_MODULE_0___default().info("Checking Swift version...");
-  const versionOutput = await _actions_exec__WEBPACK_IMPORTED_MODULE_1___default().getExecOutput("swift", ["--version"]);
-  if (versionOutput.exitCode !== 0) {
-    throw new Error("Failed to check Swift version.");
-  }
-  const versionFingerprint = versionOutput.stdout.split((os__WEBPACK_IMPORTED_MODULE_2___default().EOL))[0];
-  _actions_core__WEBPACK_IMPORTED_MODULE_0___default().info(`Swift version: ${versionFingerprint}`);
-
-  _actions_core__WEBPACK_IMPORTED_MODULE_0___default().info("Checking SDK index...");
-  const tagByVersionUrl = "https://raw.githubusercontent.com/swiftwasm/swift-sdk-index/refs/heads/main/v1/tag-by-version.json";
-  const tagByVersion = await (await fetch(tagByVersionUrl)).json();
-  const tag = tagByVersion[versionFingerprint];
-  if (!tag) {
-    throw new Error(`Tag not found for Swift version: ${versionFingerprint}.`);
-  }
-  return tag;
-}
-
-/**
- * @param {string} tag
- * @returns {Promise<{"swift-sdks": { [key: string]: { id: string, url: string, checksum: string }}}>}
- */
-async function swiftSDKInfoFromTag(tag) {
-  _actions_core__WEBPACK_IMPORTED_MODULE_0___default().info(`Querying SDK index for tag: ${tag}`);
-  const buildUrl = `https://raw.githubusercontent.com/swiftwasm/swift-sdk-index/refs/heads/main/v1/builds/${tag}.json`;
-  const build = await (await fetch(buildUrl)).json();
-  return build;
-}
-
-/**
- * @param {string} url
- * @param {string} checksum
- */
-async function installSwiftSDK(url, checksum) {
-  const args = ["sdk", "install", url, "--checksum", checksum];
-  const exitCode = await _actions_exec__WEBPACK_IMPORTED_MODULE_1___default().exec("swift", args);
-  if (exitCode !== 0) {
-    throw new Error(`Failed to install Swift SDK: ${url}`);
-  }
-}
-
-module.exports = { run };
-
-
-/***/ }),
-
 /***/ 4914:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -27604,8 +27530,8 @@ module.exports = parseParams
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			id: moduleId,
-/******/ 			loaded: false,
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
 /******/ 	
@@ -27617,9 +27543,6 @@ module.exports = parseParams
 /******/ 		} finally {
 /******/ 			if(threw) delete __webpack_module_cache__[moduleId];
 /******/ 		}
-/******/ 	
-/******/ 		// Flag the module as loaded
-/******/ 		module.loaded = true;
 /******/ 	
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
@@ -27650,35 +27573,9 @@ module.exports = parseParams
 /******/ 		};
 /******/ 	})();
 /******/ 	
-/******/ 	/* webpack/runtime/harmony module decorator */
-/******/ 	(() => {
-/******/ 		__nccwpck_require__.hmd = (module) => {
-/******/ 			module = Object.create(module);
-/******/ 			if (!module.children) module.children = [];
-/******/ 			Object.defineProperty(module, 'exports', {
-/******/ 				enumerable: true,
-/******/ 				set: () => {
-/******/ 					throw new Error('ES Modules may not assign module.exports or exports.*, Use ESM export syntax, instead: ' + module.id);
-/******/ 				}
-/******/ 			});
-/******/ 			return module;
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__nccwpck_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/compat */
@@ -27690,11 +27587,76 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (() => {
 "use strict";
-__nccwpck_require__.r(__webpack_exports__);
-/* harmony import */ var _index_js__WEBPACK_IMPORTED_MODULE_0__ = __nccwpck_require__(6136);
+
+// EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
+var core = __nccwpck_require__(7484);
+var core_default = /*#__PURE__*/__nccwpck_require__.n(core);
+// EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
+var exec = __nccwpck_require__(5236);
+var exec_default = /*#__PURE__*/__nccwpck_require__.n(exec);
+// EXTERNAL MODULE: external "os"
+var external_os_ = __nccwpck_require__(857);
+var external_os_default = /*#__PURE__*/__nccwpck_require__.n(external_os_);
+;// CONCATENATED MODULE: ./index.js
 
 
-(0,_index_js__WEBPACK_IMPORTED_MODULE_0__/* .run */ .e)();
+
+
+async function run() {
+  const tag = core_default().getInput("tag") || await tagFromSwiftVersion();
+  const swiftSDKInfo = await swiftSDKInfoFromTag(tag);
+  const target = core_default().getInput("target");
+  const sdk = swiftSDKInfo["swift-sdks"][target];
+  await installSwiftSDK(sdk.url, sdk.checksum);
+}
+
+/** @returns {Promise<string>} */
+async function tagFromSwiftVersion() {
+  core_default().info("Checking Swift version...");
+  const versionOutput = await exec_default().getExecOutput("swift", ["--version"]);
+  if (versionOutput.exitCode !== 0) {
+    throw new Error("Failed to check Swift version.");
+  }
+  const versionFingerprint = versionOutput.stdout.split((external_os_default()).EOL)[0];
+  core_default().info(`Swift version: ${versionFingerprint}`);
+
+  core_default().info("Checking SDK index...");
+  const tagByVersionUrl = "https://raw.githubusercontent.com/swiftwasm/swift-sdk-index/refs/heads/main/v1/tag-by-version.json";
+  const tagByVersion = await (await fetch(tagByVersionUrl)).json();
+  const tag = tagByVersion[versionFingerprint];
+  if (!tag) {
+    throw new Error(`Tag not found for Swift version: ${versionFingerprint}.`);
+  }
+  return tag;
+}
+
+/**
+ * @param {string} tag
+ * @returns {Promise<{"swift-sdks": { [key: string]: { id: string, url: string, checksum: string }}}>}
+ */
+async function swiftSDKInfoFromTag(tag) {
+  core_default().info(`Querying SDK index for tag: ${tag}`);
+  const buildUrl = `https://raw.githubusercontent.com/swiftwasm/swift-sdk-index/refs/heads/main/v1/builds/${tag}.json`;
+  const build = await (await fetch(buildUrl)).json();
+  return build;
+}
+
+/**
+ * @param {string} url
+ * @param {string} checksum
+ */
+async function installSwiftSDK(url, checksum) {
+  const args = ["sdk", "install", url, "--checksum", checksum];
+  const exitCode = await exec_default().exec("swift", args);
+  if (exitCode !== 0) {
+    throw new Error(`Failed to install Swift SDK: ${url}`);
+  }
+}
+
+;// CONCATENATED MODULE: ./main.js
+
+
+run();
 
 })();
 
