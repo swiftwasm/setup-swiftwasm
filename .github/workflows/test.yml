@@ -23,8 +23,6 @@ jobs:
         - os: macos-latest
         - os: ubuntu-latest
           container: swift:6.0.3
-        - os: ubuntu-latest
-          container: swift:6.0.3-amazonlinux2
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     steps:
