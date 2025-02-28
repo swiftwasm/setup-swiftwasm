@@ -11,7 +11,7 @@ jobs:
   units:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - run: npm ci
     - run: npm test
 
@@ -22,7 +22,7 @@ jobs:
       matrix:
         include:
         - swift-version: wasm-5.7.1-RELEASE
-          os: ubuntu-20.04
+          os: ubuntu-22.04
         - swift-version: wasm-5.6.0-RELEASE
           os: macos-11
         - swift-version: wasm-5.8.0-RELEASE
@@ -31,7 +31,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ./
       with:
         swift-version: ${{ matrix.swift-version }}
@@ -39,13 +39,13 @@ jobs:
   test-default:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ./
     - run: swift --version
   test-skip-add-to-path:
     runs-on: ubuntu-22.04
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ./
       id: setup
       with:
@@ -64,8 +64,8 @@ jobs:
       env:
         TOOLCHAIN_PATH: ${{ steps.setup.outputs.toolchain-path }}
   test-nightly:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: ./nightly
     - run: swift --version
