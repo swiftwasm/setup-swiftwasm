@@ -1,3 +1,3 @@
-const { run, resolveVersionInput } = require('./index');
+import { run } from './index.js';
 
-run(resolveVersionInput());
+run();

@@ -15,57 +15,24 @@ jobs:
     - run: npm ci
     - run: npm test
 
-  # test action works running from the graph
   test:
     strategy:
       fail-fast: true
       matrix:
         include:
-        - swift-version: wasm-5.7.1-RELEASE
-          os: ubuntu-22.04
-        - swift-version: wasm-5.6.0-RELEASE
-          os: macos-11
-        - swift-version: wasm-5.8.0-RELEASE
-          os: ubuntu-latest
-          container: swift:amazonlinux2
+        - os: macos-11
+        - os: ubuntu-latest
+          container: swift:6.0.3
+        - os: ubuntu-latest
+          container: swift:6.0.3-amazonlinux2
     runs-on: ${{ matrix.os }}
     container: ${{ matrix.container }}
     steps:
     - uses: actions/checkout@v4
-    - uses: ./
-      with:
-        swift-version: ${{ matrix.swift-version }}
     - run: swift --version
-  test-default:
-    runs-on: ubuntu-22.04
-    steps:
-    - uses: actions/checkout@v4
     - uses: ./
-    - run: swift --version
-  test-skip-add-to-path:
-    runs-on: ubuntu-22.04
-    steps:
-    - uses: actions/checkout@v4
-    - uses: ./
-      id: setup
-      with:
-        add-to-path: false
-    - name: Ensure that the toolchain is not added to the PATH
-      shell: node {0}
-      run: |
-        const path = require('path');
-        const toolchainPath = path.join(process.env.TOOLCHAIN_PATH, 'usr', 'bin');
-        const pathEnv = process.env.PATH;
-        console.log(`Checking if ${toolchainPath} is in the PATH (${pathEnv})`);
-        const pathCandidates = pathEnv.split(path.delimiter);
-        if (pathCandidates.includes(toolchainPath)) {
-          throw new Error(`Toolchain path ${toolchainPath} is in the PATH`);
-        }
-      env:
-        TOOLCHAIN_PATH: ${{ steps.setup.outputs.toolchain-path }}
-  test-nightly:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: ./nightly
-    - run: swift --version
+    - run: |
+        mkdir -p /tmp/hello
+        cd /tmp/hello
+        swift package init --type executable
+        swift build --swift-sdk wasm32-unknown-wasi

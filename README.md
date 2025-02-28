@@ -1,35 +1,40 @@
 # setup-swiftwasm
 
-A GitHub Action that downloads a SwiftWasm toolchain and adds it to the `PATH`.
+A GitHub Action that installs a Swift SDK for WebAssembly.
 
+## Requirements
+
+This action requires a runner with Swift installed.
 
 ## Usage
 
-To run the action with the latest SwiftWasm toolchain, add the following to your workflow file:
-
 ```yaml
-- uses: swiftwasm/setup-swiftwasm@v1
-- run: swift --version # `swift` command in SwiftWasm
+runs-on: ubuntu-latest
+container: swift:6.0.3
+steps:
+  - uses: swiftwasm/setup-swiftwasm@v2
+  - run: swift build --swift-sdk wasm32-unknown-wasi
 ```
 
-A specific toolchain version can be specified with the `swift-version` input:
+To install a Swift SDK compatible with a specific Swift version, add the following to your workflow file:
 
 ```yaml
-- uses: swiftwasm/setup-swiftwasm@v1
+- uses: swiftwasm/setup-swiftwasm@v2
   with:
-    swift-version: "wasm-5.6.0-RELEASE"
+    tag: "swift-DEVELOPMENT-SNAPSHOT-2025-02-26-a"
 ```
 
-You can also specify nightly toolchains:
+To install a Swift SDK for other targets, add the following to your workflow file:
 
 ```yaml
-- uses: swiftwasm/setup-swiftwasm@v1
+- uses: swiftwasm/setup-swiftwasm@v2
   with:
-    swift-version: "wasm-DEVELOPMENT-SNAPSHOT-2022-10-04-a"
+    target: "wasm32-unknown-wasip1-threads"
 ```
 
-You can find the list of available toolchain versions on the [SwiftWasm Releases page](https://github.com/swiftwasm/swift/releases).
+## Inputs
 
-## Supported Platforms
-
-The action currently supports macOS and Ubuntu runners.
+| Input | Default | Description |
+|-------|---------|-------------|
+| `tag` | The version of `swift` found in the PATH. | The tag name of swiftlang/swift repository to download the Swift SDK compatible with. |
+| `target` | `wasm32-unknown-wasi` | The target to install the Swift SDK for. |

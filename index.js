@@ -1,138 +1,56 @@
-const fs = require("fs");
-const core = require("@actions/core");
-const tc = require("@actions/tool-cache");
-const os = require("os");
-const path = require("path");
+import core from "@actions/core";
+import exec from "@actions/exec";
+import os from "os";
 
-const defaultSwiftVersion = "wasm-5.8.0-RELEASE";
-
-async function run(version) {
-  validateVersion(version);
-  const platform = resolveHostPlatform();
-  const url = toolchainDownloadUrl(version, platform);
-  core.debug(`Resolved toolchain download URL: ${url}`);
-  const toolchainPath = await installToolchain(url, version, platform);
-  core.info(`Toolchain installed at ${toolchainPath}`);
-  if (core.getBooleanInput("add-to-path")) {
-    core.addPath(`${toolchainPath}/usr/bin`);
-  }
-  core.setOutput("toolchain-path", toolchainPath);
+export async function run() {
+  const tag = core.getInput("tag") || await tagFromSwiftVersion();
+  const swiftSDKInfo = await swiftSDKInfoFromTag(tag);
+  const target = core.getInput("target");
+  const sdk = swiftSDKInfo["swift-sdks"][target];
+  await installSwiftSDK(sdk.url, sdk.checksum);
 }
 
-async function installToolchain(url, version, platform) {
-  const cachePath = tc.find("swiftwasm", version, platform.arch);
-  if (cachePath) {
-    core.info("Toolchain already installed.");
-    return cachePath;
+/** @returns {Promise<string>} */
+async function tagFromSwiftVersion() {
+  core.info("Checking Swift version...");
+  const versionOutput = await exec.getExecOutput("swift", ["--version"]);
+  if (versionOutput.exitCode !== 0) {
+    throw new Error("Failed to check Swift version.");
   }
-  core.info(`Downloading tool from ${url}`);
-  const downloadPath = await tc.downloadTool(url);
-  core.debug(`Installing toolchain from ${downloadPath}`);
-  let toolchainPath;
-  switch (platform.pkg) {
-    case "tar.gz": {
-      const extractedPath = await tc.extractTar(downloadPath);
-      toolchainPath = path.join(extractedPath, `swift-${version}`);
-      break;
-    }
-    case "pkg": {
-      const extractedPath = await tc.extractXar(downloadPath);
-      toolchainPath = await tc.extractTar(path.join(extractedPath, "Payload"));
-      break;
-    }
-    default:
-      throw new Error(`Unsupported package type: ${platform.pkg}`);
+  const versionFingerprint = versionOutput.stdout.split(os.EOL)[0];
+  core.info(`Swift version: ${versionFingerprint}`);
+
+  core.info("Checking SDK index...");
+  const tagByVersionUrl = "https://raw.githubusercontent.com/swiftwasm/swift-sdk-index/refs/heads/main/v1/tag-by-version.json";
+  const tagByVersion = await (await fetch(tagByVersionUrl)).json();
+  const tag = tagByVersion[versionFingerprint];
+  if (!tag) {
+    throw new Error(`Tag not found for Swift version: ${versionFingerprint}.`);
   }
-  core.debug(`Installed toolchain to ${toolchainPath}`);
-  const cachedPath = await tc.cacheDir(toolchainPath, "swiftwasm", version, platform.arch);
-  return cachedPath;
+  return tag;
 }
 
-function resolveVersionInput() {
-  const version = core.getInput('swift-version');
-  if (version) {
-    core.debug(`Using version from input: ${version}`);
-    return version;
-  }
-  if (fs.existsSync(".swift-version")) {
-    const versionFile = fs.readFileSync('.swift-version', 'utf8').trim();
-    if (versionFile !== "") {
-      core.debug(`Using version from .swift-version file: ${versionFile}`);
-      return versionFile;
-    }
-  }
-  core.debug(`Using version from default: ${defaultSwiftVersion}`);
-  return defaultSwiftVersion;
+/**
+ * @param {string} tag
+ * @returns {Promise<{"swift-sdks": { [key: string]: { id: string, url: string, checksum: string }}}>}
+ */
+async function swiftSDKInfoFromTag(tag) {
+  core.info(`Querying SDK index for tag: ${tag}`);
+  const buildUrl = `https://raw.githubusercontent.com/swiftwasm/swift-sdk-index/refs/heads/main/v1/builds/${tag}.json`;
+  const build = await (await fetch(buildUrl)).json();
+  return build;
 }
 
-function validateVersion(version) {
-  if (version === "") {
-    throw new Error("Empty version specified.");
-  }
-  if (!version.startsWith("wasm-")) {
-    throw new Error(`Invalid version specified: ${version}. Version must start with 'wasm-'. For example: '${defaultSwiftVersion}'`);
+/**
+ * @param {string} url
+ * @param {string} checksum
+ */
+async function installSwiftSDK(url, checksum) {
+  const args = ["sdk", "install", url, "--checksum", checksum];
+  const exitCode = await exec.exec("swift", args);
+  if (exitCode !== 0) {
+    throw new Error(`Failed to install Swift SDK: ${url}`);
   }
 }
 
-function resolveHostPlatform() {
-  function normalizeOS(platform) {
-    switch (platform) {
-      case "linux":
-        return "linux";
-      case "darwin":
-        return "macos";
-      default:
-        throw new Error(`Unsupported platform: ${platform}`);
-    }
-  }
-
-  function normalizeArch(arch) {
-    switch (arch) {
-      case "arm64":
-        return "arm64";
-      case "x64":
-        return "x86_64";
-      default:
-        throw new Error(`Unsupported architecture: ${arch}`);
-    }
-  }
-
-  function parseOSRelease() {
-    const osRelease = fs.readFileSync('/etc/os-release', 'utf8');
-    const lines = osRelease.split(os.EOL);
-    const osReleaseMap = {};
-    for (const line of lines) {
-      const [key, value] = line.split('=');
-      if (key && value) {
-        osReleaseMap[key] = value.replace(/["]/g, "");
-      }
-    }
-    return osReleaseMap;
-  }
-
-  const platform = normalizeOS(os.platform());
-  if (platform === "linux") {
-    const osRelease = parseOSRelease();
-    if (osRelease.ID === "ubuntu") {
-      const arch = normalizeArch(os.arch());
-      return { suffix: `ubuntu${osRelease.VERSION_ID}_${arch}`, pkg: "tar.gz", arch };
-    } else if (osRelease.ID === "amzn") {
-      if (osRelease.VERSION_ID === "2") {
-        const arch = normalizeArch(os.arch());
-        return { suffix: `amazonlinux2_${arch}`, pkg: "tar.gz", arch };
-      }
-    }
-    throw new Error(`Unsupported Linux distribution: ${osRelease.ID} ${osRelease.VERSION_ID}`);
-  } else if (platform === "macos") {
-    const arch = normalizeArch(os.arch());
-    return { suffix: `macos_${arch}`, pkg: "pkg", arch };
-  } else {
-    throw new Error(`Unsupported platform: ${platform}`);
-  }
-}
-
-function toolchainDownloadUrl(version, platform) {
-  return `https://github.com/swiftwasm/swift/releases/download/swift-${version}/swift-${version}-${platform.suffix}.${platform.pkg}`;
-}
-
-module.exports = { run, resolveVersionInput };
+module.exports = { run };

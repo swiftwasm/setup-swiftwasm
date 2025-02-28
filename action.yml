@@ -1,14 +1,21 @@
 name: 'Setup SwiftWasm'
-description: 'Download a SwiftWasm toolchain and add it to the PATH'
+description: 'Install a Swift SDK for WebAssembly'
 branding:
   color: orange
   icon: download
 inputs:
-  swift-version:
-    description: 'Swift version to configure. Reads from .swift-version if unset. Use default value if both are absent.'
-  add-to-path:
-    description: 'Add the toolchain to the PATH'
-    default: 'true'
+  tag:
+    description: >
+      The tag name of swiftlang/swift repository to download the Swift SDK compatible with.
+      For example, `swift-6.0.3-RELEASE` or `swift-DEVELOPMENT-SNAPSHOT-2025-02-26-a`.
+      By default, it uses the version of `swift` found in the PATH.
+    required: false
+  target:
+    description: >
+      The target to install the Swift SDK for.
+      For example, `wasm32-unknown-wasi` or `wasm32-unknown-wasip1-threads`.
+    required: false
+    default: 'wasm32-unknown-wasi'
 runs:
   using: 'node20'
   main: 'dist/index.js'
