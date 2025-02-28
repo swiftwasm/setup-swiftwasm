@@ -20,7 +20,7 @@ jobs:
       fail-fast: true
       matrix:
         include:
-        - os: macos-11
+        - os: macos-latest
         - os: ubuntu-latest
           container: swift:6.0.3
         - os: ubuntu-latest
@@ -29,6 +29,16 @@ jobs:
     container: ${{ matrix.container }}
     steps:
     - uses: actions/checkout@v4
+    - name: Install OSS Swift on macOS
+      if: ${{ startsWith(matrix.os, 'macos') }}
+      run: |
+        SWIFT_TOOLCHAIN_CHANNEL=swift-6.0.3-release;
+        SWIFT_TOOLCHAIN_TAG="swift-6.0.3-RELEASE";
+        pkg="$(mktemp -d)/InstallMe.pkg"; set -ex;
+        curl -o "$pkg" "https://download.swift.org/$SWIFT_TOOLCHAIN_CHANNEL/xcode/$SWIFT_TOOLCHAIN_TAG/$SWIFT_TOOLCHAIN_TAG-osx.pkg";
+        installer -pkg "$pkg" -target CurrentUserHomeDirectory;
+        TOOLCHAINS="$(plutil -extract CFBundleIdentifier raw ~/Library/Developer/Toolchains/$SWIFT_TOOLCHAIN_TAG.xctoolchain/Info.plist)";
+        echo "TOOLCHAINS=$TOOLCHAINS" >> $GITHUB_ENV
     - run: swift --version
     - uses: ./
     - run: |
