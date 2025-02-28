@@ -16,6 +16,11 @@ inputs:
       For example, `wasm32-unknown-wasi` or `wasm32-unknown-wasip1-threads`.
     required: false
     default: 'wasm32-unknown-wasi'
+outputs:
+  swift-sdk-id:
+    description: >
+      The ID of the installed Swift SDK.
+      You can pass this to `--swift-sdk` option of `swift build` command.
 runs:
   using: 'node20'
   main: 'dist/index.js'

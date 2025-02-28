@@ -8,6 +8,7 @@ export async function run() {
   const target = core.getInput("target");
   const sdk = swiftSDKInfo["swift-sdks"][target];
   await installSwiftSDK(sdk.url, sdk.checksum);
+  core.setOutput("swift-sdk-id", sdk.id);
 }
 
 /** @returns {Promise<string>} */

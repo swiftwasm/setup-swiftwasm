@@ -38,3 +38,9 @@ To install a Swift SDK for other targets, add the following to your workflow fil
 |-------|---------|-------------|
 | `tag` | The version of `swift` found in the PATH. | The tag name of swiftlang/swift repository to download the Swift SDK compatible with. |
 | `target` | `wasm32-unknown-wasi` | The target to install the Swift SDK for. |
+
+## Outputs
+
+| Output | Description |
+|-------|-------------|
+| `swift-sdk-id` | The ID of the installed Swift SDK. You can pass this to `--swift-sdk` option of `swift build` command. |

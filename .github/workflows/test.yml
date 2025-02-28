@@ -39,8 +39,9 @@ jobs:
         echo "TOOLCHAINS=$TOOLCHAINS" >> $GITHUB_ENV
     - run: swift --version
     - uses: ./
+      id: setup-swiftwasm
     - run: |
         mkdir -p /tmp/hello
         cd /tmp/hello
         swift package init --type executable
-        swift build --swift-sdk wasm32-unknown-wasi
+        swift build --swift-sdk "${{ steps.setup-swiftwasm.outputs.swift-sdk-id }}"
