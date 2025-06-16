@@ -33,7 +33,7 @@
   "devDependencies": {
     "@vercel/ncc": "^0.38.3",
     "eslint": "^9.5.0",
-    "@eslint/js": "^9.28.0",
+    "@eslint/js": "^9.29.0",
     "globals": "^16.2.0"
   }
 }
