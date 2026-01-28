@@ -27,7 +27,7 @@
   },
   "homepage": "https://github.com/swiftwasm/setup-swiftwasm#readme",
   "dependencies": {
-    "@actions/core": "^2.0.2",
+    "@actions/core": "^2.0.3",
     "@actions/exec": "^2.0.0"
   },
   "devDependencies": {
