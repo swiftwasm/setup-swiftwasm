@@ -1,6 +1,9 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
+import { create as createArtifactClient } from "@actions/artifact";
+import fs from "fs/promises";
 import os from "os";
+import path from "path";
 
 export async function run() {
   const tag = core.getInput("tag") || await tagFromSwiftVersion();
@@ -48,8 +51,84 @@ async function swiftSDKInfoFromTag(tag) {
  */
 async function installSwiftSDK(url, checksum) {
   const args = ["sdk", "install", url, "--checksum", checksum];
-  const exitCode = await exec.exec("swift", args);
-  if (exitCode !== 0) {
+  const options = { ignoreReturnCode: true };
+  let result;
+
+  core.info("Enabling core dumps for installer (ulimit -c unlimited)...");
+  result = await exec.getExecOutput(
+    "bash",
+    [
+      "-e",
+      "-o",
+      "pipefail",
+      "-c",
+      "ulimit -c unlimited; swift \"$@\"",
+      "--",
+      ...args,
+    ],
+    options,
+  );
+
+  if (result.exitCode !== 0) {
+    core.error(`Swift SDK installation failed (exitCode=${result.exitCode ?? "signal"}).`);
+    await collectCoreDumps().catch((error) => {
+      core.warning(`Failed to collect core dumps: ${error}`);
+    });
     throw new Error(`Failed to install Swift SDK: ${url}`);
+  }
+}
+
+async function collectCoreDumps() {
+  const searchRoots = [process.cwd(), "/tmp"];
+  const findArgs = [...searchRoots, "-maxdepth", "3", "-type", "f", "-name", "core*"];
+  const findResult = await exec.getExecOutput("find", findArgs, { ignoreReturnCode: true });
+  const candidates = findResult.stdout
+    .split(os.EOL)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  if (candidates.length === 0) {
+    core.warning("No core dump files were found after the crash.");
+    return;
+  }
+
+  const destDir = path.join(process.cwd(), "coredumps");
+  await fs.mkdir(destDir, { recursive: true });
+
+  const copied = [];
+  for (const src of candidates) {
+    let dest = path.join(destDir, path.basename(src));
+    let suffix = 1;
+    // Avoid overwriting when multiple files share the same basename.
+    while (await fileExists(dest)) {
+      dest = path.join(destDir, `${path.basename(src)}.${suffix}`);
+      suffix += 1;
+    }
+    await fs.copyFile(src, dest);
+    copied.push(dest);
+  }
+
+  core.info(`Collected ${copied.length} core dump file(s) to ${destDir}`);
+
+  const artifactClient = createArtifactClient();
+  try {
+    await artifactClient.uploadArtifact(
+      "setup-swiftwasm-coredumps",
+      copied,
+      process.cwd(),
+      { retentionDays: 7, compressionLevel: 5 },
+    );
+    core.info("Uploaded core dump artifact 'setup-swiftwasm-coredumps'.");
+  } catch (error) {
+    core.warning(`Uploading core dumps failed: ${error}`);
+  }
+}
+
+async function fileExists(filePath) {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false;
   }
 }

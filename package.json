@@ -28,7 +28,8 @@
   "homepage": "https://github.com/swiftwasm/setup-swiftwasm#readme",
   "dependencies": {
     "@actions/core": "^3.0.0",
-    "@actions/exec": "^3.0.0"
+    "@actions/exec": "^3.0.0",
+    "@actions/artifact": "^2.1.7"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.38.4",
