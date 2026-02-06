@@ -79,9 +79,10 @@ async function installSwiftSDK(url, checksum) {
 }
 
 async function collectCoreDumps() {
-  const searchRoots = [process.cwd(), "/tmp"];
-  const findArgs = [...searchRoots, "-maxdepth", "3", "-type", "f", "-name", "core*"];
-  const findResult = await exec.getExecOutput("find", findArgs, { ignoreReturnCode: true });
+  const searchRoots = [process.cwd(), "/tmp", "/var/lib/systemd/coredump"];
+  // Use bash to silence permission errors from systemd-private dirs.
+  const findCmd = `find ${searchRoots.map((p) => `'${p}'`).join(" ")} -maxdepth 5 -type f -name 'core*' 2>/dev/null`;
+  const findResult = await exec.getExecOutput("bash", ["-c", findCmd], { ignoreReturnCode: true });
   const candidates = findResult.stdout
     .split(os.EOL)
     .map((line) => line.trim())
