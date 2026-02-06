@@ -23,6 +23,8 @@ jobs:
     - run: swift --version
     - uses: ./
       id: setup-swiftwasm
+      with:
+        target: wasm32-unknown-wasip1-threads
     - run: |
         mkdir -p /tmp/hello
         cd /tmp/hello
