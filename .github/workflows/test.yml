@@ -10,9 +10,16 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: swift:6.0.3
+    env:
+      JAVASCRIPTKIT_WASI_BACKEND: Node
     steps:
     - uses: actions/checkout@v6
+    - name: Install prerequisites
+      run: sudo apt-get -q update && sudo apt-get install -y binutils git gnupg2 libc6-dev libcurl4-openssl-dev libedit2 libgcc-9-dev libpython3.8 libsqlite3-0 libstdc++-9-dev libxml2-dev libz3-dev pkg-config tzdata unzip zlib1g-dev curl
+    - name: Install Swift toolchain
+      uses: ./.github/actions/install-swift
+      with:
+        download-url: https://download.swift.org/development/ubuntu2204/swift-DEVELOPMENT-SNAPSHOT-2025-12-01-a/swift-DEVELOPMENT-SNAPSHOT-2025-12-01-a-ubuntu22.04.tar.gz
     - run: swift --version
     - uses: ./
       id: setup-swiftwasm
