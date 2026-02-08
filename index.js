@@ -80,6 +80,31 @@ async function installSwiftSDK(url, checksum) {
 
 async function collectCoreDumps() {
   const searchRoots = [process.cwd(), "/tmp", "/var/lib/systemd/coredump"];
+  const destDir = path.join(process.cwd(), "coredumps");
+  await fs.mkdir(destDir, { recursive: true });
+
+  // Try coredumpctl first (systemd may have captured the dump even if we cannot read files directly).
+  try {
+    const coredumpctlPath = path.join(destDir, "coredumpctl-latest.core");
+    const corectlResult = await exec.getExecOutput(
+      "bash",
+      [
+        "-c",
+        `coredumpctl --no-pager --quiet dump swift-sdk --output "${coredumpctlPath}"`,
+      ],
+      { ignoreReturnCode: true },
+    );
+    if (corectlResult.exitCode === 0) {
+      core.info("Captured core via coredumpctl.");
+    } else {
+      // Remove empty file if created.
+      await fs.rm(coredumpctlPath, { force: true });
+      core.info("coredumpctl did not return a core for swift-sdk.");
+    }
+  } catch (error) {
+    core.info(`coredumpctl unavailable or failed: ${error}`);
+  }
+
   // Use bash to silence permission errors from systemd-private dirs.
   const findCmd = `find ${searchRoots.map((p) => `'${p}'`).join(" ")} -maxdepth 5 -type f -name 'core*' 2>/dev/null`;
   const findResult = await exec.getExecOutput("bash", ["-c", findCmd], { ignoreReturnCode: true });
@@ -92,9 +117,6 @@ async function collectCoreDumps() {
     core.warning("No core dump files were found after the crash.");
     return;
   }
-
-  const destDir = path.join(process.cwd(), "coredumps");
-  await fs.mkdir(destDir, { recursive: true });
 
   const copied = [];
   for (const src of candidates) {
