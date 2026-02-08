@@ -1,6 +1,6 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
-import artifact from "@actions/artifact";
+import { DefaultArtifactClient } from "@actions/artifact";
 import fs from "fs/promises";
 import os from "os";
 import path from "path";
@@ -134,7 +134,7 @@ async function collectCoreDumps() {
   core.info(`Collected ${copied.length} core dump file(s) to ${destDir}`);
 
   try {
-    const artifactClient = new artifact.DefaultArtifactClient();
+    const artifactClient = new DefaultArtifactClient();
     await artifactClient.uploadArtifact(
       "setup-swiftwasm-coredumps",
       copied,
