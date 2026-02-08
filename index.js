@@ -133,10 +133,9 @@ async function collectCoreDumps() {
 
   core.info(`Collected ${copied.length} core dump file(s) to ${destDir}`);
 
-  const artifactClient = createArtifactClient();
   try {
-    const client = new artifact.DefaultArtifactClient();
-    await client.uploadArtifact(
+    const artifactClient = new artifact.DefaultArtifactClient();
+    await artifactClient.uploadArtifact(
       "setup-swiftwasm-coredumps",
       copied,
       process.cwd(),
