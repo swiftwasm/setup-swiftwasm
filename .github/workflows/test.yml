@@ -13,6 +13,7 @@ jobs:
     container:
       image: swiftlang/swift:nightly-jammy@sha256:2158991b3e85928e472022e5fd2fff96d0e8816b8035093fa31c7a31b0f84357
     steps:
+    - uses: actions/checkout@v6
     - uses: ./
       id: setup-swiftwasm
       with:
