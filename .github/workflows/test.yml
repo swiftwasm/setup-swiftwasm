@@ -13,6 +13,25 @@ jobs:
     container:
       image: swiftlang/swift:nightly-jammy@sha256:2158991b3e85928e472022e5fd2fff96d0e8816b8035093fa31c7a31b0f84357
     steps:
+    - run: |
+        ulimit -c unlimited
+        cat /proc/sys/kernel/core_pattern
+        sysctl -w kernel.core_pattern='core.%e.%p.%t'
+
+        . /etc/os-release
+        echo "$VERSION_CODENAME"
+        
+        apt-get update
+        apt-get install -y ubuntu-dbgsym-keyring
+        
+        cat >/etc/apt/sources.list.d/ddebs.list <<EOF
+        deb http://ddebs.ubuntu.com ${VERSION_CODENAME} main restricted universe multiverse
+        deb http://ddebs.ubuntu.com ${VERSION_CODENAME}-updates main restricted universe multiverse
+        deb http://ddebs.ubuntu.com ${VERSION_CODENAME}-proposed main restricted universe multiverse
+        EOF
+        
+        apt-get update
+        apt-get install -y gdb libcurl4-dbgsym libc6-dbgsym
     - uses: actions/checkout@v6
     - uses: ./
       id: setup-swiftwasm
