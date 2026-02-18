@@ -13,14 +13,7 @@ jobs:
     container:
       image: swiftlang/swift:nightly-jammy@sha256:2158991b3e85928e472022e5fd2fff96d0e8816b8035093fa31c7a31b0f84357
     steps:
-    - uses: actions/checkout@v6
-    - run: swift --version
     - uses: ./
       id: setup-swiftwasm
       with:
         target: wasm32-unknown-wasip1-threads
-    - run: |
-        mkdir -p /tmp/hello
-        cd /tmp/hello
-        swift package init --type executable
-        swift build --swift-sdk "${{ steps.setup-swiftwasm.outputs.swift-sdk-id }}"
